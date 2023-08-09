@@ -1,6 +1,6 @@
 const mongoose=require('mongoose')
 
-const url= "mongodb+srv://sanjay:sanjay2022@cluster0.tjzm3y1.mongodb.net/Emails?retryWrites=true&w=majority"
+const url= process.env.MONGO_URL
 
 mongoose.set("strictQuery",false);
 
