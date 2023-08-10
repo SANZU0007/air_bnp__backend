@@ -82,7 +82,7 @@ router.post("/resetpassword", async (req, res) => {
     text: `HI ${user.Name},
     There was a request to change your password!
     If you did not make this request, please ignore this email.
-    Otherwise, please click this link to change your password:   https://resplendent-capybara-108deb.netlify.app/save-new-password/${resetToken}`,
+    Otherwise, please click this link to change your password:/${resetToken}`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
