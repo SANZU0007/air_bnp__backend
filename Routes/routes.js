@@ -30,23 +30,29 @@ router.post("/signup", async (req, res) => {
   res.status(404).json({ message: "user Already exist" });
 });
 
+
 router.post("/login", async (req, res) => {
   const { Email, Password } = req.body;
 
-  const user = await model.findOne({ Email });
+  try {
+    const user = await model.findOne({ Email });
 
-  if (!user) {
-    return res.status(404).json({ message: "password" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const passwordValidate = await bcrypt.compare(Password, user.Password);
+
+    if (!passwordValidate) {
+      return res.status(401).json({ message: "Incorrect email or password" });
+    }
+
+    const token = generateToken(user._id);
+    res.json({ user, token });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "An error occurred during login" });
   }
-
-  const passwordValidate = await bcrypt.compare(Password, user.Password);
-
-  if (!passwordValidate) {
-    return res.status(404).json({ message: "Incorrect email or password" });
-  }
-
-  const token = generateToken(user._id);
-  res.json({ user, token });
 });
 
 router.post("/resetpassword", async (req, res) => {
@@ -76,7 +82,7 @@ router.post("/resetpassword", async (req, res) => {
     text: `HI ${user.Name},
     There was a request to change your password!
     If you did not make this request, please ignore this email.
-    Otherwise, please click this link to change your password: https://master--resplendent-capybara-108deb.netlify.app/save-new-password/${resetToken}`,
+    Otherwise, please click this link to change your password:   https://resplendent-capybara-108deb.netlify.app/save-new-password/${resetToken}`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
