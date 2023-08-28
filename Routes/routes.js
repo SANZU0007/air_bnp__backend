@@ -1,5 +1,6 @@
 const express = require("express");
-const model = require("../model/model");
+const { model, Booking } = require('../model/model'); // Update the path accordingly
+
 const bcrypt = require("bcrypt");
 const generateToken = require("../GenToken");
 const jwt = require("jsonwebtoken");
@@ -121,6 +122,32 @@ router.post("/savepassword", async (req, res) => {
   } catch (error) {
     console.log("Error verifying reset token:", error);
     res.status(400).json({ message: "Invalid reset token" });
+  }
+});
+
+
+router.post('/bookRoom', async (req, res) => {
+  
+    try {
+      const { roomId, guestName, checkInDate, checkOutDate } = req.body;
+  
+      const newBooking = new Booking({
+        roomId,
+        guestName,
+        checkInDate,
+        checkOutDate,
+      });
+      
+    if (!roomId || !guestName || !checkInDate || !checkOutDate) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+  
+      await newBooking.save();
+  
+      return res.status(201).json({ message: 'Room booked successfully', booking: newBooking });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'An error occurred while processing your request' });
   }
 });
 
